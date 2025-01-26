@@ -6,32 +6,32 @@ def check_domain_availability(domain, max_retries=1):
     attempts = 0
     while attempts < max_retries:
         try:
-            print(f"Проверка домена: {domain}")
+            print(f"Checking domain: {domain} | Проверка домена: {domain}")
             try:
                 response = requests.get(f"http://{domain}", timeout=1)
                 if response.status_code == 200:
-                    print(f"{domain} - Доступен по HTTP")
+                    print(f"{domain} - Available via HTTP | {domain} - Доступен по HTTP")
                     return domain, True
             except requests.RequestException:
-                print(f"{domain} - HTTP недоступен")
+                print(f"{domain} - HTTP unavailable | {domain} - HTTP недоступен")
 
             try:
                 response = requests.get(f"https://{domain}", timeout=1)
                 if response.status_code == 200:
-                    print(f"{domain} - Доступен по HTTPS")
+                    print(f"{domain} - Available via HTTPS | {domain} - Доступен по HTTPS")
                     return domain, True
             except requests.RequestException:
-                print(f"{domain} - HTTPS недоступен")
+                print(f"{domain} - HTTPS unavailable | {domain} - HTTPS недоступен")
 
             return domain, False
         except Exception as e:
             attempts += 1
-            print(f"Ошибка при проверке {domain}. Повторная попытка {attempts} из {max_retries}... Ошибка: {e}")
+            print(f"Error checking {domain}. Retry {attempts} of {max_retries}... Error: {e} | Ошибка при проверке {domain}. Повтор {attempts} из {max_retries}... Ошибка: {e}")
             time.sleep(1)
     return domain, False
 
 def main():
-    base_domain = ""
+    base_domain = "!"
     tlds = [
         ".com", ".net", ".org", ".info", ".biz", ".co", ".me", ".io", ".ai",
         ".ru", ".us", ".de", ".jp", ".uk", ".fr", ".au", ".ca", ".it", ".es",
@@ -65,8 +65,7 @@ def main():
         ".cards", ".care", ".careers", ".cash", ".catering", ".center", ".chat",
         ".cheap", ".church", ".city", ".claims", ".cleaning", ".clothing", ".club",
         ".coffee", ".community", ".company", ".computer", ".consulting", ".contractors",
-        ".cool", ".country", ".coupons", ".dance", ".dating",
-        ".deals", ".design",
+        ".cool", ".country", ".coupons", ".dance", ".dating", ".deals", ".design",
         ".diamonds", ".digital", ".directory", ".discount", ".doctor", ".dog",
         ".domains", ".education", ".email", ".energy", ".engineer", ".engineering",
         ".events", ".exchange", ".expert", ".family", ".fashion", ".finance",
@@ -104,8 +103,8 @@ def main():
         ".mr", ".ms", ".mt", ".mu", ".mv", ".mw", ".mx", ".my", ".mz", ".na",
         ".nc", ".ne", ".nf", ".ng", ".ni", ".nl", ".no", ".np", ".nr", ".nu",
         ".nz", ".om", ".org", ".pa", ".pe", ".pf", ".pg", ".ph", ".pk", ".pl",
-        ".pm", ".pn", ".pr", ".pt", ".pw", ".py", ".qa", ".re", ".ro",
-        ".rs", ".ru", ".rw", ".sa", ".sb", ".sc", ".sd", ".se", ".sg", ".sh",
+        ".pm", ".pn", ".pr", ".pt", ".pw", ".py", ".qa", ".re", ".ro", ".rs", 
+        ".ru", ".rw", ".sa", ".sb", ".sc", ".sd", ".se", ".sg", ".sh",
         ".si", ".sj", ".sk", ".sl", ".sm", ".sn", ".so", ".sr", ".ss", ".st",
         ".su", ".sv", ".sx", ".sy", ".sz", ".tc", ".td", ".tf", ".tg", ".th",
         ".tj", ".tk", ".tl", ".tm", ".tn", ".to", ".tr", ".ts", ".tt", ".tv",
@@ -116,7 +115,7 @@ def main():
     domains = [base_domain + tld for tld in tlds]
     working_domains = []
 
-    with ThreadPoolExecutor(max_workers=20) as executor: #change
+    with ThreadPoolExecutor(max_workers=5) as executor:
         future_to_domain = {executor.submit(check_domain_availability, domain): domain for domain in domains}
         
         for future in as_completed(future_to_domain):
@@ -124,12 +123,12 @@ def main():
             if is_working:
                 working_domains.append(domain)
 
-    print("Работающие домены:")
+    print("Working domains: | Рабочие домены:")
     if working_domains:
         for domain in working_domains:
             print(domain)
     else:
-        print("Нет работающих доменов.")
+        print("No working domains. | Нет рабочих доменов.")
 
 if __name__ == "__main__":
     main()
